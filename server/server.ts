@@ -8,9 +8,9 @@ dotenv.config();
 // configure MariaDB
 const dbConfig = {
   host: process.env.URL_MARIADB,
-  user: "root",
+  user: process.env.LOGIN,
   password: process.env.MDP_USER,
-  database: "WCA_DATA_04_27",
+  database: process.env.DATABASE_URL,
 };
 
 //Check if the user exist.

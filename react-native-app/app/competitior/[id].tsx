@@ -1,5 +1,4 @@
 import { useLocalSearchParams } from "expo-router";
-import i18n from "i18n-iso-countries";
 import { Image, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,11 +27,11 @@ enum Rank {
   WR = "WR",
 }
 
-i18n.registerLocale(require("i18n-iso-countries/langs/fr.json"));
 
-export default function Competitor() {
+
+export default function competitor() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
-  const data = JSON.parse(params.data);
+  const data = JSON.parse(params.data ?? "");
   return (
     <SafeAreaProvider>
       <SafeAreaView
@@ -43,24 +42,24 @@ export default function Competitor() {
         }}
       >
         <Text>{data?.name}</Text>
-        <Text>Nombre de compétitions : {data?.numberOfCompetitions}</Text>
+        {/* <Text>Nombre de compétitions : {data?.numberOfCompetitions}</Text>
         <Text>Nationnalité : {data?.country}</Text>
         <Text>Meilleur temps réalisé : {bestTime(data?.results)}</Text>
-        <Text>Meilleur rang national: {bestRank(data?.rank, Rank.NR)}</Text>
+        <Text>Meilleur rang national: {bestRank(data?.rank, Rank.NR)}</Text> */}
         <View
           style={{
             justifyContent: "flex-start",
             height: 150,
           }}
         >
-          <Image
+          {/* <Image
             src={data?.user?.avatar?.thumb_url}
             style={{
               width: 150,
               height: 150,
             }}
             resizeMode="contain"
-          ></Image>
+          ></Image> */}
         </View>
       </SafeAreaView>
     </SafeAreaProvider>

@@ -1,4 +1,4 @@
-import useGetUserInfo from "@/hooks/useGetUserInfo";
+import useCheckUser from "@/hooks/useCheckUser";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -17,18 +17,31 @@ export default function Index() {
   let Loading = null;
   const router = useRouter();
 
-  const { refetch } = useGetUserInfo(myValue);
+  const { refetch } = useCheckUser(myValue);
   const fetchData = async () => {
     const { data } = await refetch();
-    if (data) {
+    //On va directement sur le profil
+    if (data && data.length == 1) {
       Loading = "Chargement...";
+      console.log(data)
       router.push({
         pathname: `/competitior/[id]`,
         params: {
-          id: data?.id ?? "",
-          data: JSON.stringify(data),
+          id: data[0].wca_id ?? "",
+          data: JSON.stringify(data[0]),
         },
       });
+    //On propose un choix de personnes correspondantes 
+    } else if (data && data.length > 1){
+      const mappedData = data.map((item: any) => JSON.stringify(item))
+      console.log(mappedData)
+      router.push({
+        pathname: `/competitior/list`,
+        params: {
+          list: mappedData.join('&')
+        },
+      });
+
     } else {
       return ToastAndroid.show(
         "Erreur: " + myValue + " ne correspond à aucun profil.",
