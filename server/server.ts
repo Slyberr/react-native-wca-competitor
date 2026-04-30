@@ -10,7 +10,7 @@ const dbConfig = {
   host: process.env.URL_MARIADB,
   user: process.env.LOGIN,
   password: process.env.MDP_USER,
-  database: process.env.DATABASE_URL,
+  database: process.env.DB_NAME,
 };
 
 //Check if the user exist.
