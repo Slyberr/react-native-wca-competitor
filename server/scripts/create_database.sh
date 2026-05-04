@@ -60,7 +60,7 @@ echo_color "$BLUE" "Creating tables and indexs for performance..."
 
 mysql -u "$LOGIN" -p"$MDP_USER" -e "
 
-USE wca_data;
+USE $DB_NAME;
 CREATE OR REPLACE TABLE geo_by_person as (SELECT p.wca_id,con.id as continent_id,cy.id as country_id  FROM persons p, countries cy, continents con
 WHERE p.country_id = cy.id
 AND cy.continent_id = con.id);
@@ -70,13 +70,13 @@ CREATE INDEX idx_ranks_single ON ranks_single(person_id);
 CREATE INDEX idx_ranks_average ON ranks_average(person_id);
 
 
-CREATE OR REPLACE TABLE ranks_by_geo AS
-    (SELECT count(*) as total,p.country_id,rs.event_id,'single' 
+CREATE OR REPLACE TABLE count_by_event_country AS
+    (SELECT count(*) as total,p.country_id, p.continent_id,rs.event_id,'single' 
         FROM geo_by_person p, ranks_single rs
         WHERE rs.person_id = p.wca_id
         GROUP BY p.country_id,rs.event_id)
     UNION
-    (SELECT count(*) as total,p.country_id,ra.event_id,'average' 
+    (SELECT count(*) as total,p.country_id, p.continent_id,ra.event_id,'average' 
         FROM geo_by_person p, ranks_average ra
         WHERE ra.person_id = p.wca_id
         GROUP BY p.country_id,ra.event_id);
