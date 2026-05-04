@@ -21,7 +21,7 @@ if [ -f "../.env" ]; then
    source "../.env"
    set +o allexport
 else
-    echo_color "$RED" "ERROR ❌: the .env file is unreachable ! Name : $ENV_FILE"
+    echo_color "$RED" "ERROR ❌: the .env file is unreachable  !  (Please execute the script IN the folder) Name : $ENV_FILE"
     exit 1
 fi
 
@@ -82,6 +82,8 @@ CREATE OR REPLACE TABLE ranks_by_geo AS
         GROUP BY p.country_id,ra.event_id);
 
 SHOW TABLES;"
+
+cd ..
 
 rm -d -r wca_data/
 rm wca_data.zip
