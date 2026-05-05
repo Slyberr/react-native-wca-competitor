@@ -1,3 +1,4 @@
+import useGetBest from "@/hooks/useGetBest";
 import { useLocalSearchParams } from "expo-router";
 import { Image, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -42,10 +43,7 @@ export default function competitor() {
         }}
       >
         <Text>{data?.name}</Text>
-        {/* <Text>Nombre de compétitions : {data?.numberOfCompetitions}</Text>
-        <Text>Nationnalité : {data?.country}</Text>
-        <Text>Meilleur temps réalisé : {bestTime(data?.results)}</Text>
-        <Text>Meilleur rang national: {bestRank(data?.rank, Rank.NR)}</Text> */}
+        <Text>Meilleur temps réalisé : {bestTime(params.id)}</Text>
         <View
           style={{
             justifyContent: "flex-start",
@@ -66,26 +64,15 @@ export default function competitor() {
   );
 }
 
-function bestTime(data: Record<any, any>): string {
-  let bestTime = 999999;
-  let eventId = "NULL";
-  for (const [keyComp, valueComp] of Object.entries(data)) {
-    for (const [keyEvent, valueEvent] of Object.entries(valueComp)) {
-      for (const round of valueEvent) {
-        console.log(round);
-        if (
-          round?.best! > 1 &&
-          round?.best < bestTime &&
-          keyEvent !== "333fm"
-        ) {
-          eventId = keyEvent;
-          bestTime = round.best;
-        }
-      }
-    }
+function bestTime(ID : string): string {
+  const {data,error} = useGetBest(ID)
+  if (error) {
+    console.error("There is an error : " + error.message)
   }
-
-  return `${convertHHMM(bestTime)} (${eventMap.get(eventId)})`;
+  if (data && data.length > 0) {
+    return `${convertHHMM(data[0].best)} (${eventMap.get(data[0].event_id)})`
+  }
+  return ""
 }
 
 function bestRank(data: Record<any, any>, rankType: Rank): string {

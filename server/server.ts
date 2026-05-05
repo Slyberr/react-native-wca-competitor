@@ -13,19 +13,55 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
-//Check if the user exist.
-app.get("/persons/:input", async (req: any, res: any) => {
+
+
+//Find the user(s) by ID or name.
+app.get("/", async (req : any, res: any) => {
+  
+  res.json({ res: "hi" });
+    
+});
+
+
+//Find the user(s) by ID or name.
+app.get("/person/:input", async (req: any, res: any) => {
   try {
     const input: string = req?.params?.input;
     //Manage white spaces
     input.replace(/\s+/g, " ");
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
-      "SELECT * FROM persons where  wca_id = ? OR name like ? ",
+      `SELECT * from persons p, geo_by_person gp 
+	      WHERE p.wca_id = gp.wca_id
+        AND (p.wca_id = ? OR  p.name like ?)`,
       [input, `%${input}%`],
     );
     await connection.end();
+    
     return res.json(rows);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//Get the best time + event for the user
+app.get("/best/:ID/", async (req: any, res: any) => {
+  try {
+    const ID: string = req?.params?.ID;
+    
+
+    const connection = await createConnection(dbConfig);
+    const [rows] = await connection.query(
+      `SELECT event_id,best FROM ranks_single 
+	      WHERE event_id NOT IN ('333mbf', '333fm')
+	      AND person_id = ?
+	      ORDER BY best 
+	      LIMIT 1;`,
+      [ID],
+    );
+    await connection.end();
+    console.log(rows)
+    return res.json(rows) ;
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
