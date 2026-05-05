@@ -1,4 +1,5 @@
 import useGetBest from "@/hooks/useGetBest";
+import useGetNationalRank from "@/hooks/useGetNationalRank";
 import { useLocalSearchParams } from "expo-router";
 import { Image, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -44,6 +45,8 @@ export default function competitor() {
       >
         <Text>{data?.name}</Text>
         <Text>Meilleur temps réalisé : {bestTime(params.id)}</Text>
+        <Text>Meilleur rang national  : {bestNationalRank(params.id)}</Text>
+        <Text>Meilleur rang mondial : {bestNationalRank(params.id)}</Text>
         <View
           style={{
             justifyContent: "flex-start",
@@ -75,27 +78,34 @@ function bestTime(ID : string): string {
   return ""
 }
 
-function bestRank(data: Record<any, any>, rankType: Rank): string {
-  let bestRank = 999999;
-  let eventId = "NULL";
+function bestNationalRank(ID: string): string {
+  const {data : test,error} = useGetNationalRank(ID)
+  if (error) {
+    console.error("There is an error : " + error.message)
+  }
+  if (test && test.length > 0) {
+    console.log(test, "here")
+    let bestTX = 0
+    let eventID : string = ""
+    let total = 0
+    let rank = 0
+    let type = ""
 
-  for (const [keyType, valueType] of Object.entries(data)) {
-    for (const event of valueType) {
-      if (rankType == "NR" && event?.rank.country < bestRank) {
-        bestRank = event?.rank.country;
-        eventId = event?.eventId;
-      } else if (rankType == "CR" && event?.rank.continent < bestRank) {
-        bestRank = event?.rank.world;
-        eventId = event?.eventId;
-      } else {
-        if (event?.rank.world < bestRank) {
-          bestRank = event?.rank.world;
-          eventId = event?.eventId;
-        }
+    for(const rang of test) {
+      const TX =   1 - (rang.country_rank /rang.country_total)
+      if (TX > bestTX ) {
+        bestTX = TX
+        eventID = rang.event_id ?? ""
+        total = rang.country_total
+        rank = rang.country_rank
+        type = rang.single
       }
     }
+    //Si la personne a plusieurs NR, on prend celui qui est le "plus dur à avoir". On met le taux à 1 artificiellement
+    //par la suite
+    return `${eventMap.get(eventID)} ${type} (${rank === 1 ? "1er" : rank + "e"} sur ${total}, Tx = ${rank === 1 ? 1 : Math.floor(bestTX*1000)/1000})`
   }
-  return `${bestRank} (${eventMap.get(eventId)})`;
+  return "NO DATA";
 }
 
 function convertHHMM(time: number): string {
@@ -124,3 +134,4 @@ function convertHHMM(time: number): string {
     ? `${min}:${seconds}.${mill} ${label}`
     : `${seconds}.${mill} ${label}`;
 }
+

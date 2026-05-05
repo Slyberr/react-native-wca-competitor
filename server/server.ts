@@ -13,15 +13,10 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
-
-
 //Find the user(s) by ID or name.
-app.get("/", async (req : any, res: any) => {
-  
+app.get("/", async (req: any, res: any) => {
   res.json({ res: "hi" });
-    
 });
-
 
 //Find the user(s) by ID or name.
 app.get("/person/:input", async (req: any, res: any) => {
@@ -37,7 +32,7 @@ app.get("/person/:input", async (req: any, res: any) => {
       [input, `%${input}%`],
     );
     await connection.end();
-    
+
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -48,7 +43,6 @@ app.get("/person/:input", async (req: any, res: any) => {
 app.get("/best/:ID/", async (req: any, res: any) => {
   try {
     const ID: string = req?.params?.ID;
-    
 
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
@@ -60,8 +54,39 @@ app.get("/best/:ID/", async (req: any, res: any) => {
       [ID],
     );
     await connection.end();
-    console.log(rows)
-    return res.json(rows) ;
+    console.log(rows);
+    return res.json(rows);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//Get all nationals event rank for an competitior
+//TODO : change cbe.single -> cbe.type
+app.get("/ranks/national/:ID", async (req: any, res: any) => {
+  try {
+    const ID: string = req?.params?.ID;
+
+    const connection = await createConnection(dbConfig);
+    const [rows] = await connection.query(
+      `(SELECT rs.person_id,rs.event_id, rs.country_rank, cbe.total as country_total,cbe.country_id,cbe.single from geo_by_person gp, count_by_event_country cbe,  ranks_single rs
+WHERE rs.person_id = gp.wca_id
+AND gp.wca_id = ?
+AND cbe.type = 'single'
+AND gp.country_id = cbe.country_id
+AND cbe.event_id = rs.event_id)
+UNION ALL
+(SELECT ra.person_id,ra.event_id, ra.country_rank, cbe.total as country_total,cbe.country_id,cbe.single from geo_by_person gp, count_by_event_country cbe,  ranks_average ra
+WHERE ra.person_id = gp.wca_id
+AND gp.wca_id =  ?
+AND cbe.type = 'average'
+AND gp.country_id = cbe.country_id
+AND cbe.event_id = ra.event_id);`,
+      [ID, ID],
+    );
+    await connection.end();
+    console.log(rows);
+    return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }

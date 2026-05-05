@@ -71,12 +71,12 @@ CREATE INDEX idx_ranks_average ON ranks_average(person_id);
 
 
 CREATE OR REPLACE TABLE count_by_event_country AS
-    (SELECT count(*) as total,p.country_id, p.continent_id,rs.event_id,'single' 
+    (SELECT count(*) as total,p.country_id, p.continent_id,rs.event_id,'single' as type 
         FROM geo_by_person p, ranks_single rs
         WHERE rs.person_id = p.wca_id
         GROUP BY p.country_id,rs.event_id)
     UNION
-    (SELECT count(*) as total,p.country_id, p.continent_id,ra.event_id,'average' 
+    (SELECT count(*) as total,p.country_id, p.continent_id,ra.event_id,'average' as type
         FROM geo_by_person p, ranks_average ra
         WHERE ra.person_id = p.wca_id
         GROUP BY p.country_id,ra.event_id);
