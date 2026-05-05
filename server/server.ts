@@ -26,9 +26,16 @@ app.get("/person/:input", async (req: any, res: any) => {
     input.replace(/\s+/g, " ");
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
-      `SELECT * from persons p, geo_by_person gp 
-	      WHERE p.wca_id = gp.wca_id
-        AND (p.wca_id = ? OR  p.name like ?)`,
+      `SELECT 
+          * 
+        FROM 
+          persons p,
+          geo_by_person gp 
+	      WHERE 
+          p.wca_id = gp.wca_id
+        AND 
+          (p.wca_id = ? 
+          OR  p.name like ?)`,
       [input, `%${input}%`],
     );
     await connection.end();
@@ -46,11 +53,17 @@ app.get("/best/:ID/", async (req: any, res: any) => {
 
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
-      `SELECT event_id,best FROM ranks_single 
-	      WHERE event_id NOT IN ('333mbf', '333fm')
-	      AND person_id = ?
-	      ORDER BY best 
-	      LIMIT 1;`,
+      `SELECT 
+        event_id,
+        best
+      FROM 
+        ranks_single 
+	    WHERE 
+        event_id NOT IN ('333mbf', '333fm')
+	    AND 
+        person_id = ?
+	    ORDER BY best 
+	    LIMIT 1;`,
       [ID],
     );
     await connection.end();
@@ -69,19 +82,49 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
 
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
-      `(SELECT rs.person_id,rs.event_id, rs.country_rank, cbe.total as country_total,cbe.country_id,cbe.single from geo_by_person gp, count_by_event_country cbe,  ranks_single rs
-WHERE rs.person_id = gp.wca_id
-AND gp.wca_id = ?
-AND cbe.type = 'single'
-AND gp.country_id = cbe.country_id
-AND cbe.event_id = rs.event_id)
-UNION ALL
-(SELECT ra.person_id,ra.event_id, ra.country_rank, cbe.total as country_total,cbe.country_id,cbe.single from geo_by_person gp, count_by_event_country cbe,  ranks_average ra
-WHERE ra.person_id = gp.wca_id
-AND gp.wca_id =  ?
-AND cbe.type = 'average'
-AND gp.country_id = cbe.country_id
-AND cbe.event_id = ra.event_id);`,
+      `(SELECT 
+        rs.person_id,
+        rs.event_id,
+        rs.country_rank,
+        cbe.total AS country_total,
+        cbe.country_id,cbe.single 
+      FROM 
+        geo_by_person gp,
+        count_by_event_country cbe,
+        ranks_single rs
+      WHERE 
+        rs.person_id = gp.wca_id
+      AND 
+        gp.wca_id = ?
+      AND
+         cbe.type = 'single'
+      AND 
+        gp.country_id = cbe.country_id
+      AND 
+        cbe.event_id = rs.event_id)
+      UNION ALL
+      (SELECT 
+        ra.person_id,
+        ra.event_id,
+        ra.country_rank,
+        cbe.total AS
+        country_total,
+        cbe.country_id,
+        cbe.single 
+      FROM 
+          geo_by_person gp,
+          count_by_event_country cbe,
+          ranks_average ra
+      WHERE 
+        ra.person_id = gp.wca_id
+      AND 
+        gp.wca_id =  ?
+      AND 
+        cbe.type = 'average'
+      AND 
+        gp.country_id = cbe.country_id
+      AND 
+        cbe.event_id = ra.event_id);`,
       [ID, ID],
     );
     await connection.end();
