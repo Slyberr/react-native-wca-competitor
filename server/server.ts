@@ -74,8 +74,7 @@ app.get("/best/:ID/", async (req: any, res: any) => {
   }
 });
 
-//Get all nationals event rank for an competitior
-//TODO : change cbe.single -> cbe.type
+//Get competitior national ranks for all events.
 app.get("/ranks/national/:ID", async (req: any, res: any) => {
   try {
     const ID: string = req?.params?.ID;
@@ -86,8 +85,8 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
         rs.person_id,
         rs.event_id,
         rs.country_rank,
-        cbe.total AS country_total,
-        cbe.country_id,cbe.single 
+        cbe.total AS total_country,
+        cbe.country_id,cbe.type 
       FROM 
         geo_by_person gp,
         count_by_event_country cbe,
@@ -107,10 +106,9 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
         ra.person_id,
         ra.event_id,
         ra.country_rank,
-        cbe.total AS
-        country_total,
+        cbe.total AS total_country,
         cbe.country_id,
-        cbe.single 
+        cbe.type 
       FROM 
           geo_by_person gp,
           count_by_event_country cbe,
@@ -135,7 +133,135 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
   }
 });
 
+
+//Get competitior continental ranks for all events.
+app.get("/ranks/continental/:ID", async (req: any, res: any) => {
+  try {
+    const ID: string = req?.params?.ID;
+
+    const connection = await createConnection(dbConfig);
+    const [rows] = await connection.query(
+      `(SELECT 
+ 	      cbe.event_id,
+ 	      sum(cbe.total) AS total_continent,
+ 	      rs.person_id,
+ 	      cbe.continent_id,
+ 	      rs.continent_rank,
+ 	      cbe.type
+ 	    FROM
+	      geo_by_person gp,
+ 	      count_by_event_country cbe,
+ 	      ranks_single rs
+      WHERE 
+        gp.wca_id = ?
+      AND 
+	      gp.wca_id = rs.person_id
+      AND
+	      cbe.continent_id = gp.continent_id
+      AND
+	      cbe.type = 'single'
+      AND
+	      cbe.event_id = rs.event_id
+      GROUP BY 
+	      (cbe.event_id))
+	
+      UNION ALL
+
+      (SELECT 
+ 	      cbe.event_id,
+ 	      sum(cbe.total) AS total_continent,
+ 	      ra.person_id,
+ 	      cbe.continent_id,
+ 	      ra.continent_rank,
+ 	      cbe.type
+ 	    FROM
+	      geo_by_person gp,
+ 	      count_by_event_country cbe,
+ 	      ranks_average ra
+ 	    WHERE 
+	      gp.wca_id = ?
+      AND 
+	      gp.wca_id = ra.person_id
+      AND
+	      cbe.continent_id = gp.continent_id
+      AND
+	      cbe.type = 'average'
+      AND
+	      cbe.event_id = ra.event_id
+      GROUP BY 
+	      (cbe.event_id));`,
+      [ID, ID],
+    );
+    await connection.end();
+    console.log(rows);
+    return res.json(rows);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+//Get  competitior world ranks for all events.
+app.get("/ranks/world/:ID", async (req: any, res: any) => {
+  try {
+    const ID: string = req?.params?.ID;
+
+    const connection = await createConnection(dbConfig);
+    const [rows] = await connection.query(
+      `(SELECT 
+	      rs.person_id,
+	      rs.world_rank,
+	      cbe.event_id,
+	      cbe.type,
+	      SUM(total) AS total_world
+      FROM
+	      count_by_event_country cbe,
+	      ranks_single rs
+      WHERE 
+	      rs.person_id = ?
+      AND 
+	      rs.event_id = cbe.event_id
+      AND
+	      cbe.type = 'single'
+      GROUP BY 
+	      cbe.event_id,
+        cbe.type
+      )
+    UNION ALL 
+
+    (SELECT 
+	    ra.person_id,
+	    ra.world_rank,
+	    cbe.event_id,
+	    cbe.type,
+	    SUM(total) AS total_world
+    FROM
+	    count_by_event_country cbe,
+	    ranks_average ra
+    WHERE 
+	    ra.person_id = ?
+    AND 
+	    ra.event_id = cbe.event_id
+    AND
+	    cbe.type = 'average'
+    GROUP BY 
+	    cbe.event_id,
+      cbe.type
+    );`,
+      [ID, ID],
+    );
+    await connection.end();
+    console.log(rows);
+    return res.json(rows);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Serveur started on :${PORT}`);
 });
+
