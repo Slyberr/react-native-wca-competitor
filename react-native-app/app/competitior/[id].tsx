@@ -8,6 +8,7 @@ import useGetBest from "@/hooks/useGetBest";
 
 export default function competitor() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
+  console.log(params.data)
   const data = JSON.parse(params.data ?? "");
   return (
     <SafeAreaProvider>

@@ -1,3 +1,4 @@
+import { Card } from "@/components/card";
 import { useLocalSearchParams } from "expo-router";
 import { FlatList, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -13,7 +14,7 @@ export default function competitiorList() {
 
     return (<SafeAreaProvider>
           <SafeAreaView>
-            <FlatList data={tabPersons} renderItem={({item}) => <Text>{item.name}</Text> }></FlatList>
+            <FlatList data={tabPersons} style={{}} renderItem={({item}) => <Card name={item.name} data={item}/>}/>
           </SafeAreaView>
           </SafeAreaProvider>)
 }
