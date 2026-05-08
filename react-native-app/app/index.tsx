@@ -58,7 +58,7 @@ export default function Index() {
             Bienvenue sur competitor Viewer !
           </Text>
           <Image
-            style={{ width: 350, height: 350 }}
+            style={{ width: 250, height: 250 }}
             source={require("@/assets/images/WCA-logo.png")}
           />
         </View>
@@ -77,12 +77,13 @@ export default function Index() {
               borderWidth: 1,
               width: "80%",
               marginTop: 30,
+              marginBottom: 15
             }}
             defaultValue=""
             placeholder="Entrez l'ID WCA"
           ></TextInput>
 
-          <Button title="Search" color="#000000" onPress={fetchData}></Button>
+          <Button title="Search" color="#05186b" onPress={fetchData}></Button>
           <Text>{Loading}</Text>
         </View>
       </SafeAreaView>

@@ -5,6 +5,7 @@
   ["333bf", "3x3 à l'aveugle"],
   ["333mbf", "3x3 multiple à l'aveugle"],
   ["333fm", "3x3 résolution optimisé"],
+  ["333ft", "3x3 avec les pieds (burk)"],
   ["444", "4x4"],
   ["444bf", "4x4 à l'aveugle"],
   ["555", "5x5"],
@@ -16,6 +17,9 @@
   ["sq1", "Square-1"],
   ["minx", "Megaminx"],
   ["clock", "Clock"],
+  ["magic", "Magic"],
+  ["mmagic", "Master Magic"],
+  
 ]);
 
 export enum Rank {

@@ -1,4 +1,4 @@
-import { convertMMSS } from "@/app/utils/convertMMSS";
+import { convertMMSS } from "@/utils/convertMMSS";
 import { eventMap, Rank } from "@/types/rank";
 import { timeoutManager, useQuery } from "@tanstack/react-query";
 

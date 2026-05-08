@@ -64,7 +64,7 @@ app.get("/best/:ID/", async (req: any, res: any) => {
 	    AND 
         person_id = ?
 	    ORDER BY best 
-	    LIMIT 1;`,
+	    LIMIT 3;`,
       [ID],
     );
     await connection.end();
