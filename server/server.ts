@@ -35,7 +35,8 @@ app.get("/person/:input", async (req: any, res: any) => {
           p.wca_id = gp.wca_id
         AND 
           (p.wca_id = ? 
-          OR  p.name like ?)`,
+          OR  p.name like ?)
+        ORDER BY p.name`,
       [input, `%${input}%`],
     );
     await connection.end();
@@ -85,6 +86,7 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
         rs.person_id,
         rs.event_id,
         rs.country_rank,
+        rs.best,
         cbe.total AS total_country,
         cbe.country_id,cbe.type 
       FROM 
@@ -106,6 +108,7 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
         ra.person_id,
         ra.event_id,
         ra.country_rank,
+        ra.best,
         cbe.total AS total_country,
         cbe.country_id,
         cbe.type 
@@ -146,6 +149,7 @@ app.get("/ranks/continental/:ID", async (req: any, res: any) => {
  	      sum(cbe.total) AS total_continent,
  	      rs.person_id,
  	      cbe.continent_id,
+        rs.best,
  	      rs.continent_rank,
  	      cbe.type
  	    FROM
@@ -171,7 +175,8 @@ app.get("/ranks/continental/:ID", async (req: any, res: any) => {
  	      cbe.event_id,
  	      sum(cbe.total) AS total_continent,
  	      ra.person_id,
- 	      cbe.continent_id,
+        cbe.continent_id,
+        ra.best,
  	      ra.continent_rank,
  	      cbe.type
  	    FROM
@@ -210,6 +215,7 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
       `(SELECT 
 	      rs.person_id,
 	      rs.world_rank,
+        rs.best,
 	      cbe.event_id,
 	      cbe.type,
 	      SUM(total) AS total_world
@@ -231,6 +237,7 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
     (SELECT 
 	    ra.person_id,
 	    ra.world_rank,
+      ra.best,
 	    cbe.event_id,
 	    cbe.type,
 	    SUM(total) AS total_world

@@ -5,7 +5,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function competitiorList() {
     const params = useLocalSearchParams<{list?: string }>();
-    //const tabOfPersons = params.list?.map((item) => JSON.parse(item)) ?? []
     const tabPersons = params.list?.split('&').map((item) => JSON.parse(item)) ?? []
     
     for (const person of tabPersons) {

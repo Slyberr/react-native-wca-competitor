@@ -1,5 +1,6 @@
+import { convertMMSS } from "@/app/utils/convertMMSS";
 import { eventMap, Rank } from "@/types/rank";
-import { useQuery } from "@tanstack/react-query";
+import { timeoutManager, useQuery } from "@tanstack/react-query";
 
 export function useBestNationalRank(ID: string): string {
   return useGetRegionRank(ID, Rank.NR);
@@ -51,22 +52,47 @@ function useGetRegionRank(ID: string, typeRank: Rank): string {
     let total = 0;
     let rank = 0;
     let type = "";
+    let time = 0;
 
     for (const rang of data) {
-      const currentRank = typeRank === Rank.NR ? rang.country_rank : typeRank === Rank.CR ? rang.continent_rank : rang.world_rank
-      const currentTotal = typeRank === Rank.NR ? rang.total_country : typeRank === Rank.CR ? rang.total_continent : rang.total_world
-      const Top =  1 - currentRank / currentTotal
+      const currentRank =
+        typeRank === Rank.NR
+          ? rang.country_rank
+          : typeRank === Rank.CR
+            ? rang.continent_rank
+            : rang.world_rank;
+      const currentTotal =
+        typeRank === Rank.NR
+          ? rang.total_country
+          : typeRank === Rank.CR
+            ? rang.total_continent
+            : rang.total_world;
+      const Top = 1 - currentRank / currentTotal;
       if (Top > bestTop) {
+        console.log(rang);
         bestTop = Top;
         eventID = rang.event_id ?? "";
         total = currentTotal;
         rank = currentRank;
         type = rang.type;
+        time = rang.best;
       }
     }
     //Si la personne a plusieurs NR, on prend celui qui est le "plus dur à avoir". On met le taux à 1 artificiellement
     //par la suite
-    return `${eventMap.get(eventID)} ${type} \n (${rank === 1 ? "1er" : rank + "e"} /  ${total}), ${rank === 1 ? typeRank : `Top ${Math.floor(100000 - bestTop * 100000) / 1000}%`} `;
+    return displayStat(eventID,type,rank,typeRank,total,bestTop,time)
   }
   return "NO DATA";
+}
+
+function displayStat(eventID : string,type : string,rank : number,typerank : string,total : number,bestTop : number,time: number) {
+  const eventIDToString = eventMap.get(eventID);
+  let displayTime : string | number = time
+  //Le FMC n'est pas compris par le calcul convertMMSS
+  if (eventID!='333fm') {
+    displayTime = convertMMSS(time,eventID)
+  }
+
+  return `\n\n ${eventIDToString} ${displayTime} ${type} \n (${rank === 1 ? "1er" : rank + "e"} /  ${total}), ${rank === 1 ? typerank + ' !' : `Top ${Math.floor(100000 - bestTop * 100000) / 1000}%`}\n`;
+
 }
