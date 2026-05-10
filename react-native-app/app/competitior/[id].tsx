@@ -6,6 +6,7 @@ import { useBestNationalRank, useBestContinentRank, useBestWorldRank } from '@/h
 import useGetBest from "@/hooks/useGetBest";
 import { convertMMSS } from "../../utils/convertMMSS";
 import useGetPPicture from "@/hooks/useGetPPicture";
+import emojiFlags from "emoji-flags";
 
 
 export default function competitor() {
@@ -13,6 +14,7 @@ export default function competitor() {
   const data = JSON.parse(params.data ?? "");
   const { data: img, error: imgError, isLoading: imgLoading } = useGetPPicture(params.id)
   const profilePicture = img?.person?.avatar?.url
+  
   
   console.log(profilePicture)
 
@@ -26,7 +28,7 @@ export default function competitor() {
       >
         <View style={{ alignItems: "center"}}>
 
-         <Text style={{ fontSize: 30, margin: 20, textAlign: "center" }}>{data?.name}</Text>
+         <Text style={{ fontSize: 30, margin: 20, textAlign: "center" }}>{data?.name} {emojiFlags.countryCode(data?.code_country).emoji}</Text>
          <View style={{ width: '100%', height: 170, alignItems: "center", justifyContent:"center" }}>
           {imgLoading  
               ? (<ActivityIndicator size="large" color="#0000ff" style={{}} />) 
