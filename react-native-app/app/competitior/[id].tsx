@@ -21,22 +21,36 @@ export default function competitor() {
       <SafeAreaView
         style={{
           flex: 1,
-          alignItems: "center",
           margin: 10,
         }}
       >
-        <Text style={{ fontSize: 30, margin: 20, textAlign: "center" }}>{data?.name}</Text>
-        <View style={{ width: '100%', height: 200, alignItems: "center", justifyContent:"center" }}>
+        <View style={{ alignItems: "center"}}>
+
+         <Text style={{ fontSize: 30, margin: 20, textAlign: "center" }}>{data?.name}</Text>
+         <View style={{ width: '100%', height: 170, alignItems: "center", justifyContent:"center" }}>
           {imgLoading  
               ? (<ActivityIndicator size="large" color="#0000ff" style={{}} />) 
-              : (<Image src={profilePicture} style={{ width: '100%', height: 180, objectFit: "contain" } }></Image>)}
+              : (<Image src={profilePicture} style={{ width: '100%', height: 150, objectFit: "contain" } }></Image>)}
 
+         </View>
         </View>
-
-        <Text>Meilleur rang National : {useBestNationalRank(params.id)}</Text>
-        <Text>Meilleur rang Continental : {useBestContinentRank(params.id)}</Text>
-        <Text>Meilleur rang Mondial : {useBestWorldRank(params.id)}</Text>
-        <Text>Temps notables : {'\n' + bestTime(params.id)}</Text>
+       
+        <View>
+          <View>
+              <Text style={{fontSize:20}}>Meilleur rang National: </Text> 
+              <Text>{useBestNationalRank(params.id)}</Text>
+          </View>
+           <View>
+              <Text style={{fontSize:20}}>Meilleur rang Continental: </Text> 
+              <Text>{useBestContinentRank(params.id)}</Text>
+          </View>
+           <View>
+              <Text style={{fontSize:20}}>Meilleur rang Mondial: </Text> 
+              <Text>{useBestWorldRank(params.id)}</Text>
+          </View>
+            <Text>Temps notables : {'\n' + bestTime(params.id)}</Text>
+        </View>
+        
 
         <View
           style={{

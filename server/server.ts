@@ -29,14 +29,11 @@ app.get("/person/:input", async (req: any, res: any) => {
       `SELECT 
           * 
         FROM 
-          persons p,
-          geo_by_person gp 
-	      WHERE 
-          p.wca_id = gp.wca_id
-        AND 
-          (p.wca_id = ? 
-          OR  p.name like ?)
-        ORDER BY p.name`,
+          wca_person_countries
+        WHERE 
+          (wca_id = ? 
+          OR  name like ?)
+        ORDER BY name`,
       [input, `%${input}%`],
     );
     await connection.end();
@@ -87,45 +84,46 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
         rs.event_id,
         rs.country_rank,
         rs.best,
-        cbe.total AS total_country,
-        cbe.country_id,cbe.type 
+        pec.total AS total_country,
+        pec.country_id,
+        pec.type 
       FROM 
-        geo_by_person gp,
-        count_by_event_country cbe,
+        wca_person_countries p,
+        persons_event_country pec,
         ranks_single rs
       WHERE 
-        rs.person_id = gp.wca_id
+        rs.person_id = p.wca_id
       AND 
-        gp.wca_id = ?
+        p.wca_id = ?
       AND
-         cbe.type = 'single'
+         pec.type = 'single'
       AND 
-        gp.country_id = cbe.country_id
+        p.country_id = pec.country_id
       AND 
-        cbe.event_id = rs.event_id)
+        pec.event_id = rs.event_id)
       UNION ALL
       (SELECT 
         ra.person_id,
         ra.event_id,
         ra.country_rank,
         ra.best,
-        cbe.total AS total_country,
-        cbe.country_id,
-        cbe.type 
+        pec.total AS total_country,
+        pec.country_id,
+        pec.type 
       FROM 
-          geo_by_person gp,
-          count_by_event_country cbe,
+          wca_person_countries p,
+          persons_event_country pec,
           ranks_average ra
       WHERE 
-        ra.person_id = gp.wca_id
+        ra.person_id = p.wca_id
       AND 
-        gp.wca_id =  ?
+        p.wca_id = ?
       AND 
-        cbe.type = 'average'
+        pec.type = 'average'
       AND 
-        gp.country_id = cbe.country_id
+        p.country_id = pec.country_id
       AND 
-        cbe.event_id = ra.event_id);`,
+        pec.event_id = ra.event_id);`,
       [ID, ID],
     );
     await connection.end();
@@ -145,56 +143,56 @@ app.get("/ranks/continental/:ID", async (req: any, res: any) => {
     const connection = await createConnection(dbConfig);
     const [rows] = await connection.query(
       `(SELECT 
- 	      cbe.event_id,
- 	      sum(cbe.total) AS total_continent,
+ 	      pec.event_id,
+ 	      sum(pec.total) AS total_continent,
  	      rs.person_id,
- 	      cbe.continent_id,
+ 	      pec.continent_id,
         rs.best,
  	      rs.continent_rank,
- 	      cbe.type
+ 	      pec.type
  	    FROM
-	      geo_by_person gp,
- 	      count_by_event_country cbe,
+	      wca_person_countries p,
+ 	      persons_event_country pec,
  	      ranks_single rs
       WHERE 
-        gp.wca_id = ?
+        p.wca_id = ?
       AND 
-	      gp.wca_id = rs.person_id
+	      p.wca_id = rs.person_id
       AND
-	      cbe.continent_id = gp.continent_id
+	      pec.continent_id = p.continent_id
       AND
-	      cbe.type = 'single'
+	      pec.type = 'single'
       AND
-	      cbe.event_id = rs.event_id
+	      pec.event_id = rs.event_id
       GROUP BY 
-	      (cbe.event_id))
+	      (pec.event_id))
 	
       UNION ALL
 
       (SELECT 
- 	      cbe.event_id,
- 	      sum(cbe.total) AS total_continent,
+ 	      pec.event_id,
+ 	      sum(pec.total) AS total_continent,
  	      ra.person_id,
-        cbe.continent_id,
+        pec.continent_id,
         ra.best,
  	      ra.continent_rank,
- 	      cbe.type
+ 	      pec.type
  	    FROM
-	      geo_by_person gp,
- 	      count_by_event_country cbe,
+	      wca_person_countries p,
+ 	      persons_event_country pec,
  	      ranks_average ra
  	    WHERE 
-	      gp.wca_id = ?
+	      p.wca_id = ?
       AND 
-	      gp.wca_id = ra.person_id
+	      p.wca_id = ra.person_id
       AND
-	      cbe.continent_id = gp.continent_id
+	      pec.continent_id = p.continent_id
       AND
-	      cbe.type = 'average'
+	      pec.type = 'average'
       AND
-	      cbe.event_id = ra.event_id
+	      pec.event_id = ra.event_id
       GROUP BY 
-	      (cbe.event_id));`,
+	      (pec.event_id));`,
       [ID, ID],
     );
     await connection.end();
@@ -216,43 +214,44 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
 	      rs.person_id,
 	      rs.world_rank,
         rs.best,
-	      cbe.event_id,
-	      cbe.type,
+	      pec.event_id,
+	      pec.type,
 	      SUM(total) AS total_world
       FROM
-	      count_by_event_country cbe,
+	      persons_event_country pec,
 	      ranks_single rs
       WHERE 
 	      rs.person_id = ?
       AND 
-	      rs.event_id = cbe.event_id
+	      rs.event_id = pec.event_id
       AND
-	      cbe.type = 'single'
+	      pec.type = 'single'
       GROUP BY 
-	      cbe.event_id,
-        cbe.type
-      )
+	      pec.event_id,
+          pec.type
+     	)
+          
     UNION ALL 
 
     (SELECT 
 	    ra.person_id,
 	    ra.world_rank,
-      ra.best,
-	    cbe.event_id,
-	    cbe.type,
+      	ra.best,
+	    pec.event_id,
+	    pec.type,
 	    SUM(total) AS total_world
-    FROM
-	    count_by_event_country cbe,
+    FROM'2017PRES04'
+	    persons_event_country pec,
 	    ranks_average ra
     WHERE 
 	    ra.person_id = ?
     AND 
-	    ra.event_id = cbe.event_id
+	    ra.event_id = pec.event_id
     AND
-	    cbe.type = 'average'
+	    pec.type = 'average'
     GROUP BY 
-	    cbe.event_id,
-      cbe.type
+	    pec.event_id,
+      	pec.type
     );`,
       [ID, ID],
     );
