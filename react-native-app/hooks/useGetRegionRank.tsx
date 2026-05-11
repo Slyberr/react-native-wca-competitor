@@ -1,20 +1,25 @@
 import { convertMMSS } from "@/utils/convertMMSS";
-import { eventMap, Rank } from "@/types/rank";
+import {Rank } from "@/types/rank";
 import { timeoutManager, useQuery } from "@tanstack/react-query";
+import { Text, View } from "react-native";
+import { Image } from "expo-image";
+import { eventImage, eventMap } from "@/types/event";
 
-export function useBestNationalRank(ID: string): string {
+
+
+export function useBestNationalRank(ID: string) : React.JSX.Element  {
   return useGetRegionRank(ID, Rank.NR);
 }
 
-export function useBestContinentRank(ID: string): string {
+export function useBestContinentRank(ID: string) : React.JSX.Element  {
   return useGetRegionRank(ID, Rank.CR);
 }
 
-export function useBestWorldRank(ID: string): string {
+export function useBestWorldRank(ID: string) : React.JSX.Element {
   return useGetRegionRank(ID, Rank.WR);
 }
 
-function useGetRegionRank(ID: string, typeRank: Rank): string {
+function useGetRegionRank(ID: string, typeRank: Rank) : React.JSX.Element  {
   let endpoint = process.env.EXPO_PUBLIC_API_URL + "/ranks/";
 
   switch (typeRank) {
@@ -44,7 +49,7 @@ function useGetRegionRank(ID: string, typeRank: Rank): string {
 
   if (error) {
     console.error("There is an error : " + error.message);
-    return "ERROR";
+    return <Text>Error</Text>;
   }
   if (data && data.length > 0) {
     let bestTop = 0;
@@ -82,17 +87,38 @@ function useGetRegionRank(ID: string, typeRank: Rank): string {
     //par la suite
     return displayStat(eventID,type,rank,typeRank,total,bestTop,time)
   }
-  return "NO DATA";
+  return <Text>No DATA</Text>;
 }
 
-function displayStat(eventID : string,type : string,rank : number,typerank : string,total : number,bestTop : number,time: number) {
+function displayStat(eventID : string,type : string,rank : number,typerank : string,total : number,bestTop : number,time: number){
   const eventIDToString = eventMap.get(eventID);
   let displayTime : string | number = time
   //Le FMC n'est pas compris par le calcul convertMMSS
   if (eventID!='333fm') {
     displayTime = convertMMSS(time,eventID)
   }
+  let place = rank + "e"
+  let topShow = Math.floor(100000 - bestTop * 100000) / 1000 + '%'
 
-  return `\n\n ${eventIDToString} ${displayTime} ${type} \n (${rank === 1 ? "1er" : rank + "e"} /  ${total}), ${rank === 1 ? typerank + ' !' : `Top ${Math.floor(100000 - bestTop * 100000) / 1000}%`}\n`;
+  if (rank === 1 ) {
+    place = '1er'
+    topShow = typerank + '!'
+  } else if (rank < 50 && typerank === Rank.WR) {
+    topShow = 'World-Class'
+  } else if (rank < 10 && typerank === Rank.WR) {
+    topShow = 'Élite'
+  }
 
+  const fullString = `${displayTime} ${type} ${place}/${total}, ${topShow}`
+
+  return (
+    
+    <View style={{flexDirection:'row'}}>
+      <Image 
+        source={eventImage[eventID]} 
+        style={{ width: 20, height: 20 }}>
+      </Image>
+      <Text> {fullString}</Text>
+    </View>
+  )
 }

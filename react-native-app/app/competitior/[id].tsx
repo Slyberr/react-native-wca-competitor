@@ -1,19 +1,21 @@
-import { eventMap, Rank } from "@/types/rank";
 import { useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Image, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useBestNationalRank, useBestContinentRank, useBestWorldRank } from '@/hooks/useGetRegionRank';
 import useGetBest from "@/hooks/useGetBest";
 import { convertMMSS } from "../../utils/convertMMSS";
 import useGetPPicture from "@/hooks/useGetPPicture";
 import emojiFlags from "emoji-flags";
+import { eventMap } from "@/types/event";
+import { Image } from "expo-image";
 
 
 export default function competitor() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
   const data = JSON.parse(params.data ?? "");
-  const { data: img, error: imgError, isLoading: imgLoading } = useGetPPicture(params.id)
-  const profilePicture = img?.person?.avatar?.url
+  const { data: wca_resume, error: imgError, isLoading: imgLoading } = useGetPPicture(params.id)
+  console.log(wca_resume)
+  const profilePicture = wca_resume?.person?.avatar?.url
   
   
   console.log(profilePicture)
@@ -26,49 +28,41 @@ export default function competitor() {
           margin: 10,
         }}
       >
-        <View style={{ alignItems: "center"}}>
 
          <Text style={{ fontSize: 30, margin: 20, textAlign: "center" }}>{data?.name} {emojiFlags.countryCode(data?.code_country).emoji}</Text>
-         <View style={{ width: '100%', height: 170, alignItems: "center", justifyContent:"center" }}>
+
+        <View style={{flexDirection:'row', justifyContent:'space-around', alignItems:'flex-start'}}>
+         <View style={{ width: '45%', height: 170, alignContent:'flex-start',justifyContent:'center',overflow:'hidden', borderWidth:3}}>
           {imgLoading  
               ? (<ActivityIndicator size="large" color="#0000ff" style={{}} />) 
-              : (<Image src={profilePicture} style={{ width: '100%', height: 150, objectFit: "contain" } }></Image>)}
+              : (<Image source={profilePicture} contentFit="cover" contentPosition='top center' style={{ width: '100%',height:'100%'} }></Image>)}
 
+         </View>
+         <View style={{flexDirection: "column"}}>
+          <Text>Nombre de compétitions : {wca_resume?.competition_count} </Text>
+          <Text>Médailles : {wca_resume?.medals?.total === 0 ? 'Pas encore !' : wca_resume?.medals.total} </Text>
+          <Text>Records nationaux : {wca_resume?.records?.national}</Text>
+          <Text>Records continentaux : {wca_resume?.records?.continental}</Text>
+          <Text>Records mondiaux : {wca_resume?.records?.world}</Text>
          </View>
         </View>
        
         <View>
           <View>
               <Text style={{fontSize:20}}>Meilleur rang National: </Text> 
-              <Text>{useBestNationalRank(params.id)}</Text>
+              {useBestNationalRank(params.id)}
           </View>
            <View>
               <Text style={{fontSize:20}}>Meilleur rang Continental: </Text> 
-              <Text>{useBestContinentRank(params.id)}</Text>
+              {useBestContinentRank(params.id)}
           </View>
            <View>
               <Text style={{fontSize:20}}>Meilleur rang Mondial: </Text> 
-              <Text>{useBestWorldRank(params.id)}</Text>
+              {useBestWorldRank(params.id)}
           </View>
             <Text>Temps notables : {'\n' + bestTime(params.id)}</Text>
         </View>
         
-
-        <View
-          style={{
-            justifyContent: "flex-start",
-            height: 150,
-          }}
-        >
-          {/* <Image
-            src={data?.user?.avatar?.thumb_url}
-            style={{
-              width: 150,
-              height: 150,
-            }}
-            resizeMode="contain"
-          ></Image> */}
-        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );

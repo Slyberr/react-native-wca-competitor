@@ -240,7 +240,7 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
 	    pec.event_id,
 	    pec.type,
 	    SUM(total) AS total_world
-    FROM'2017PRES04'
+    FROM
 	    persons_event_country pec,
 	    ranks_average ra
     WHERE 
