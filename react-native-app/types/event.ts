@@ -1,4 +1,4 @@
-export const eventImage : Record<string,any>= {
+export const eventIconLight : Record<string,any>= {
     '222' : require('@/assets/images/events/222.png'),
     '333' : require('@/assets/images/events/333.png'),
     '333bf' : require('@/assets/images/events/333bf.png'),
@@ -19,6 +19,30 @@ export const eventImage : Record<string,any>= {
     'pyram' : require('@/assets/images/events/pyram.png'),
     'skewb' : require('@/assets/images/events/skewb.png'),
     'sq1' : require('@/assets/images/events/sq1.png')
+}
+
+
+export const eventIconDark : Record<string,any>= {
+    '222' : require('@/assets/images/events/222-dark.png'),
+    '333' : require('@/assets/images/events/333-dark.png'),
+    '333bf' : require('@/assets/images/events/333bf-dark.png'),
+    '333fm' : require('@/assets/images/events/333fm-dark.png'),
+    '333ft' : require('@/assets/images/events/333ft-dark.png'),
+    '333mbf' : require('@/assets/images/events/333mbf-dark.png'),
+    '333oh' : require('@/assets/images/events/333-dark.png'),
+    '444' : require('@/assets/images/events/444-dark.png'),
+    '444bf' : require('@/assets/images/events/444bf-dark.png'),
+    '555' : require('@/assets/images/events/555-dark.png'),
+    '555bf' : require('@/assets/images/events/555bf-dark.png'),
+    '666' : require('@/assets/images/events/666-dark.png'),
+    '777' : require('@/assets/images/events/777-dark.png'),
+    'clock' : require('@/assets/images/events/clock-dark.png'),
+    'magic' : require('@/assets/images/events/magic-dark.png'),
+    'minx' : require('@/assets/images/events/minx-dark.png'),
+    'mmagic' : require('@/assets/images/events/mmagic-dark.png'),
+    'pyram' : require('@/assets/images/events/pyram-dark.png'),
+    'skewb' : require('@/assets/images/events/skewb-dark.png'),
+    'sq1' : require('@/assets/images/events/sq1-dark.png')
 }
 
  export const eventMap =  new Map([

@@ -1,4 +1,6 @@
+import { TextThemed } from "@/components/organics/TextThemed";
 import useCheckUser from "@/hooks/useCheckUser";
+import useColorMode from "@/hooks/useColorMode";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -8,6 +10,7 @@ import {
   Text,
   TextInput,
   ToastAndroid,
+  useColorScheme,
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +19,11 @@ export default function Index() {
   const [myValue, setInputValue] = React.useState("");
   let Loading = null;
   const router = useRouter();
+  const colorScheme = useColorScheme()
+  const colors = useColorMode(colorScheme)
+  const textColor = colors?.text?.color
+  const backgroundColor = colors?.backgroundColor
+  const inputStyle = colors?.input
 
   const { refetch } = useCheckUser(myValue);
   const fetchData = async () => {
@@ -52,35 +60,33 @@ export default function Index() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor : backgroundColor }}>
         <View style={{ alignItems: "center", gap: 10, margin: 10 }}>
-          <Text style={{ fontSize: 25 }}>
-            Bienvenue sur competitor Viewer !
-          </Text>
+          <TextThemed  content="Bienvenue sur compétitor viewer !" />
           <Image
             style={{ width: 250, height: 250 }}
-            source={require("@/assets/images/WCA-logo.png")}
+            source={colorScheme === 'light' ? require("@/assets/images/WCA-logo.png") : require("@/assets/images/WCA-logo-dark.png")}
           />
         </View>
 
         <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 18, marginTop: 30 }}>
-            Trouvez votre compétiteur.
-          </Text>
+          <TextThemed content="Trouvez votre compétiteur." style={{fontSize:25}}></TextThemed>
           <TextInput
             onChangeText={setInputValue}
             value={myValue}
             style={{
-              borderColor: "#000000",
+              borderColor: inputStyle?.borderColor,
               borderStyle: "solid",
               borderRadius: 10,
               borderWidth: 1,
               width: "80%",
               marginTop: 30,
-              marginBottom: 15
+              marginBottom: 15,
+              color : inputStyle?.textColor,
             }}
             defaultValue=""
-            placeholder="Entrez l'ID WCA"
+            placeholder="Entrez un nom ou un ID WCA."
+            placeholderTextColor={inputStyle?.placeholderColor}
           ></TextInput>
 
           <Button title="Search" color="#05186b" onPress={fetchData}></Button>

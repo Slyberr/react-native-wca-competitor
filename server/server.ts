@@ -33,7 +33,8 @@ app.get("/person/:input", async (req: any, res: any) => {
         WHERE 
           (wca_id = ? 
           OR  name like ?)
-        ORDER BY name`,
+        ORDER BY name
+        LIMIT 100`,
       [input, `%${input}%`],
     );
     await connection.end();

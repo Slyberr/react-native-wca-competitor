@@ -1,27 +1,15 @@
 import { convertMMSS } from "@/utils/convertMMSS";
 import {Rank } from "@/types/rank";
 import { timeoutManager, useQuery } from "@tanstack/react-query";
-import { Text, View } from "react-native";
+import { ColorSchemeName, Text, useColorScheme, View } from "react-native";
 import { Image } from "expo-image";
-import { eventImage, eventMap } from "@/types/event";
+import { eventIconLight, eventIconDark, eventMap } from "@/types/event";
+import { TextThemed } from "@/components/organics/TextThemed";
 
 
-
-export function useBestNationalRank(ID: string) : React.JSX.Element  {
-  return useGetRegionRank(ID, Rank.NR);
-}
-
-export function useBestContinentRank(ID: string) : React.JSX.Element  {
-  return useGetRegionRank(ID, Rank.CR);
-}
-
-export function useBestWorldRank(ID: string) : React.JSX.Element {
-  return useGetRegionRank(ID, Rank.WR);
-}
-
-function useGetRegionRank(ID: string, typeRank: Rank) : React.JSX.Element  {
+export function useGetRegionRank(ID: string, typeRank: Rank) : React.JSX.Element  {
   let endpoint = process.env.EXPO_PUBLIC_API_URL + "/ranks/";
-
+  const colorScheme = useColorScheme()
   switch (typeRank) {
     case Rank.CR:
       endpoint += "continental/";
@@ -85,20 +73,19 @@ function useGetRegionRank(ID: string, typeRank: Rank) : React.JSX.Element  {
     }
     //Si la personne a plusieurs NR, on prend celui qui est le "plus dur à avoir". On met le taux à 1 artificiellement
     //par la suite
-    return displayStat(eventID,type,rank,typeRank,total,bestTop,time)
+    return displayStat(eventID,type,rank,typeRank,total,bestTop,time,colorScheme)
   }
   return <Text>No DATA</Text>;
 }
 
-function displayStat(eventID : string,type : string,rank : number,typerank : string,total : number,bestTop : number,time: number){
-  const eventIDToString = eventMap.get(eventID);
+function displayStat(eventID : string,type : string,rank : number,typerank : string,total : number,bestTop : number,time: number,colorScheme: ColorSchemeName) : React.JSX.Element {
   let displayTime : string | number = time
   //Le FMC n'est pas compris par le calcul convertMMSS
   if (eventID!='333fm') {
     displayTime = convertMMSS(time,eventID)
   }
   let place = rank + "e"
-  let topShow = Math.floor(100000 - bestTop * 100000) / 1000 + '%'
+  let topShow : number | string =  ''
 
   if (rank === 1 ) {
     place = '1er'
@@ -109,16 +96,30 @@ function displayStat(eventID : string,type : string,rank : number,typerank : str
     topShow = 'Élite'
   }
 
+  if (topShow === '') {
+    console.log(bestTop)
+    topShow = Math.floor(10000 - bestTop * 10000) / 100
+    if (topShow >0.5) {
+      topShow = Math.floor(1000 - bestTop * 1000) / 10
+    }
+    topShow = 'Top ' + topShow + ' %' 
+  }
+
   const fullString = `${displayTime} ${type} ${place}/${total}, ${topShow}`
+  
+  let eventIcon =  eventIconLight[eventID]
+  if (colorScheme === "dark") {
+    eventIcon = eventIconDark[eventID]
+  }
 
   return (
     
-    <View style={{flexDirection:'row'}}>
+    <View style={{flexDirection:'row', margin: 10, gap:5}}>
       <Image 
-        source={eventImage[eventID]} 
+        source={eventIcon} 
         style={{ width: 20, height: 20 }}>
       </Image>
-      <Text> {fullString}</Text>
+      <TextThemed content={fullString}/> 
     </View>
   )
 }
