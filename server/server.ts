@@ -33,7 +33,7 @@ app.get("/person/:input", async (req: any, res: any) => {
         WHERE 
           (wca_id = ? 
           OR  name like ?)
-        ORDER BY name
+        ORDER BY code_country,name
         LIMIT 100`,
       [input, `%${input}%`],
     );
@@ -66,7 +66,6 @@ app.get("/best/:ID/", async (req: any, res: any) => {
       [ID],
     );
     await connection.end();
-    console.log(rows);
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -128,7 +127,6 @@ app.get("/ranks/national/:ID", async (req: any, res: any) => {
       [ID, ID],
     );
     await connection.end();
-    console.log(rows);
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -197,7 +195,6 @@ app.get("/ranks/continental/:ID", async (req: any, res: any) => {
       [ID, ID],
     );
     await connection.end();
-    console.log(rows);
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -257,7 +254,6 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
       [ID, ID],
     );
     await connection.end();
-    console.log(rows);
     return res.json(rows);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });

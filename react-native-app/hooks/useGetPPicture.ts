@@ -4,7 +4,7 @@ const endpoint = process.env.EXPO_PUBLIC_WCA_URL
 
 
 export default function useGetPPicture(ID: string) {
-console.log(endpoint,process.env.EXPO_PRIVATE_PRIVATE_TOKEN)
+
   return useQuery({
     queryKey: [ID+"IMG"],
     queryFn: async () => {

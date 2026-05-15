@@ -62,7 +62,6 @@ export function useGetRegionRank(ID: string, typeRank: Rank) : React.JSX.Element
             : rang.total_world;
       const Top = 1 - currentRank / currentTotal;
       if (Top > bestTop) {
-        console.log(rang);
         bestTop = Top;
         eventID = rang.event_id ?? "";
         total = currentTotal;
@@ -97,7 +96,6 @@ function displayStat(eventID : string,type : string,rank : number,typerank : str
   }
 
   if (topShow === '') {
-    console.log(bestTop)
     topShow = Math.floor(10000 - bestTop * 10000) / 100
     if (topShow >0.5) {
       topShow = Math.floor(1000 - bestTop * 1000) / 10

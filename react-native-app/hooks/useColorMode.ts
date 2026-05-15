@@ -20,6 +20,9 @@ const colors = {
         text : {
             color : '#FFFFFF'
         },
+        button : {
+            backgroundColor : '#97007e'
+        },
 
         input : {
             placeholderColor : '#dfd9d9',
@@ -28,9 +31,12 @@ const colors = {
         }
     },
     light : {
-        backgroundColor : '#cecece',
+        backgroundColor : '#ffffff',
         border  :  {
             color : '#000000',
+        },
+        button : {
+            backgroundColor : '#000000'
         },
         text : {
             color : '#000000'

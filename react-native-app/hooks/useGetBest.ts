@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 const endpoint = process.env.EXPO_PUBLIC_API_URL + "/best/";
 
 export default function useGetBest(ID: string) {
-  console.log(endpoint + ID)
   return useQuery({
     queryKey: [ID+"bestime"],
     queryFn: async () => {

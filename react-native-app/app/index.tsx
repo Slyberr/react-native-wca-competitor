@@ -31,7 +31,6 @@ export default function Index() {
     //On va directement sur le profil
     if (data && data.length == 1) {
       Loading = "Chargement...";
-      console.log(data)
       router.push({
         pathname: `/competitior/[id]`,
         params: {
@@ -42,7 +41,6 @@ export default function Index() {
     //On propose un choix de personnes correspondantes 
     } else if (data && data.length > 1){
       const mappedData = data.map((item: any) => JSON.stringify(item))
-      console.log(mappedData)
       router.push({
         pathname: `/competitior/list`,
         params: {
@@ -89,7 +87,7 @@ export default function Index() {
             placeholderTextColor={inputStyle?.placeholderColor}
           ></TextInput>
 
-          <Button title="Search" color="#05186b" onPress={fetchData}></Button>
+          <Button title="Search" color={colors.button.backgroundColor} onPress={fetchData}></Button>
           <Text>{Loading}</Text>
         </View>
       </SafeAreaView>
