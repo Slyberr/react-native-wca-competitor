@@ -261,6 +261,36 @@ app.get("/ranks/world/:ID", async (req: any, res: any) => {
 });
 
 
+//Get competitior best single/average for every event at his all comps
+app.get("/competitions/bests/:ID", async (req: any, res: any) => {
+  try {
+    const ID: string = req?.params?.ID;
+
+    const connection = await createConnection(dbConfig);
+    const [rows] = await connection.query(
+      `SELECT 
+	      id,
+        r.competition_id,
+        event_id,
+        round_type_id,
+        best,
+        average
+      FROM 
+	      results r 
+      WHERE 
+	      person_id = ?
+	    ORDER BY 
+        id`,
+      [ID],
+    );
+    await connection.end();
+    return res.json(rows);
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+
 
 
 const PORT = 3000;
