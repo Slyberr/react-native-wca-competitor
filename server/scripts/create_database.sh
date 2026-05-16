@@ -71,7 +71,9 @@ CREATE OR REPLACE TABLE
                       FROM persons p,
                         countries cy
                       WHERE 
-                        p.country_id = cy.id);
+                        p.country_id = cy.id
+                      AND 
+                      	p.sub_id  = 1);
 
 CREATE INDEX idx_wca_person_countries ON wca_person_countries(wca_id);
 CREATE INDEX idx_ranks_single ON ranks_single(person_id);
